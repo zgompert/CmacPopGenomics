@@ -22,7 +22,7 @@ The pool-seq data are currently in /uufs/chpc.utah.edu/common/home/gompert-group
 
 # PoolSeq Alignment and Variant Calling
 
-I am aligning the DNA sequence data to the updated (based on PacBio) L. melissa genome. I am using bwa-mem2 for this, which is basically just a sped up version of bwa mem that also works directly with gzipped files https://github.com/bwa-mem2/bwa-mem2. I am using bwa-mem2 version 2.0pre2.
+I am aligning the DNA sequence data to the *C. maculatus* genome on [NCBI](https://www.ncbi.nlm.nih.gov/genome/?term=txid64391[Organism:noexp]), which comes from [Sayadi et al. 2019](https://pubmed.ncbi.nlm.nih.gov/31740847/). I am using bwa-mem2 for this, which is basically just a sped up version of bwa mem that also works directly with gzipped files https://github.com/bwa-mem2/bwa-mem2. I am using bwa-mem2 version 2.0pre2.
 
 First, I (re)indexed the reference genome.
 
