@@ -22,7 +22,7 @@ The pool-seq data are currently in /uufs/chpc.utah.edu/common/home/gompert-group
 
 # PoolSeq Alignment and Variant Calling
 
-I am aligning the DNA sequence data to the *C. maculatus* genome on [NCBI](https://www.ncbi.nlm.nih.gov/genome/?term=txid64391[Organism:noexp]), which comes from [Sayadi et al. 2019](https://pubmed.ncbi.nlm.nih.gov/31740847/). I am using bwa-mem2 for this, which is basically just a sped up version of bwa mem that also works directly with gzipped files https://github.com/bwa-mem2/bwa-mem2. I am using bwa-mem2 version 2.0pre2.
+I am aligning the DNA sequence data to the *C. maculatus* genome on [NCBI](https://www.ncbi.nlm.nih.gov/genome/?term=txid64391[Organism:noexp]), which comes from [Sayadi et al. 2019](https://pubmed.ncbi.nlm.nih.gov/31740847/). I am using bwa-mem2 for this, which is basically just a sped up version of bwa mem that also works directly with gzipped files https://github.com/bwa-mem2/bwa-mem2. I am using bwa-mem2 version 2.0pre2. My overall approach roughly follows the suggested workflow for `samtools` [as described here](https://www.htslib.org/workflow/wgs-call.html).
 
 First, I (re)indexed the reference genome.
 
@@ -84,3 +84,53 @@ foreach $fq1 (@ARGV){
 $pm->wait_all_children;
 ```
 I am pipping the results on to samtools (version 1.16) to compress, sort and index the alignments.
+
+Next, I am name sorting the alignments and fixing read pairing information with `samtools`. I am doing this to get things ready for indel realignment and removing duplicates (my next steps). For this, I ran:
+
+```bash
+#!/bin/sh
+#SBATCH --time=120:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=20
+#SBATCH --account=wolf-kp
+#SBATCH --partition=wolf-kp
+#SBATCH --job-name=samt
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=zach.gompert@usu.edu
+
+module load samtools
+##Version: 1.16 (using htslib 1.16)
+
+cd /scratch/general/nfs1/cmac
+
+perl /uufs/chpc.utah.edu/common/home/gompert-group2/data/cmac_poolseq/Scripts/FixMatesFork.pl *bam
+```
+
+Which runs the following:
+
+```perl
+#!/usr/bin/perl
+#
+# fix mates, sort and index with samtools
+#
+
+
+use Parallel::ForkManager;
+my $max = 40;
+my $pm = Parallel::ForkManager->new($max);
+
+FILES:
+foreach $bam (@ARGV){
+        $pm->start and next FILES; ## fork
+        $bam =~ m/^([A-Za-z0-9]+)/ or die "failed to match $bam\n";
+        $base = $1;
+        system "samtools collate -o co_$base.bam $bam /scratch/general/nfs1/cmac/t$bam\n";
+        system "samtools fixmate -m co_$base.bam fix_$base.bam\n";
+        system "samtools sort -o sort_$base.bam fix_$base.bam\n";
+        $pm->finish;
+}
+
+$pm->wait_all_children;
+```
+
+Note that this is being done in a scratch directory. I will move back key files for long-term storage.
