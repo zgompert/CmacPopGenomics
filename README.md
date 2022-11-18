@@ -134,3 +134,64 @@ $pm->wait_all_children;
 ```
 
 Note that this is being done in a scratch directory. I will move back key files for long-term storage.
+
+The next step was to perform indel realignment. Note, this is not available in `GATK` version 4 as this is done as part of variant calling. However, my plan is to call variants with bcftools (much faster) and thus I do want to perform a separate indel realignment. I am using `GATK` version 3.8 for this. 
+
+As a precoursos to indel realignment I created a dict reference file for the genome.
+
+```bash
+## dict file with Picard tools 2.22.0
+java -jar /uufs/chpc.utah.edu/sys/installdir/picard/2.22.0/picard.jar CreateSequenceDictionary R=/uufs/chpc.utah.edu/common/home/gompert-group1/data/cmac_qtl_AR/goran_genome/reference/CAACVG01.fasta
+```
+Next, I used `samtools` to index the sorted bam files and `GATK` for indel realignment.
+
+```bash
+#!/bin/sh
+#SBATCH --time=120:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=20
+#SBATCH --account=gompert-kp
+#SBATCH --partition=gompert-kp
+#SBATCH --job-name=gatkre
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=zach.gompert@usu.edu
+
+module load samtools
+##Version: 1.16 (using htslib 1.16)
+module load gatk
+## version 3.8
+
+cd /scratch/general/nfs1/cmac
+
+perl /uufs/chpc.utah.edu/common/home/gompert-group2/data/cmac_poolseq/Scripts/RealnFork.pl sort_*bam
+```
+
+```perl
+#!/usr/bin/perl
+#
+# indel realignment with GATK version v3.8-0-ge9d806836 
+# using this because GATK4 does not have indel realignment 
+#
+
+
+use Parallel::ForkManager;
+my $max = 12;
+my $pm = Parallel::ForkManager->new($max);
+
+my $genome = "/uufs/chpc.utah.edu/common/home/gompert-group1/data/cmac_qtl_AR/goran_genome/reference/CAACVG01.fasta";
+
+FILES:
+foreach $bam (@ARGV){
+	$pm->start and next FILES; ## fork
+	$bam =~ m/sort_([A-Za-z0-9]+)/ or die "failed to match $bam\n";
+	$base = $1;
+	#system "samtools index -b $bam\n";
+	print "gatk -T RealignerTargetCreator  -I $bam -o $base.intervals -R $genome &\n";
+	#print "gatk -T IndelRealigner -R $genome -targetIntervals $base.intervals -I $bam -o realn_$base.bam\n";
+	
+	$pm->finish;
+}
+
+$pm->wait_all_children;
+```
+
