@@ -185,9 +185,9 @@ foreach $bam (@ARGV){
 	$pm->start and next FILES; ## fork
 	$bam =~ m/sort_([A-Za-z0-9]+)/ or die "failed to match $bam\n";
 	$base = $1;
-	#system "samtools index -b $bam\n";
-	print "gatk -T RealignerTargetCreator  -I $bam -o $base.intervals -R $genome &\n";
-	#print "gatk -T IndelRealigner -R $genome -targetIntervals $base.intervals -I $bam -o realn_$base.bam\n";
+	system "samtools index -b $bam\n";
+	system "gatk -T RealignerTargetCreator  -I $bam -o $base.intervals -R $genome\n";
+	system "gatk -T IndelRealigner -R $genome -targetIntervals $base.intervals -I $bam -o realn_$base.bam\n";
 	
 	$pm->finish;
 }
