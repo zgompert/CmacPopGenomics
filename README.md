@@ -195,3 +195,53 @@ foreach $bam (@ARGV){
 $pm->wait_all_children;
 ```
 
+Note that I had issues running `GATK` 3.8 using the loaded module via my standard fork perl script approach. I did get all of the above commands to run, but had to go about this in a rather convulted way.
+
+Next, I used `samtools` to remove PCR duplicates. The submission script was:
+
+```bash
+#!/bin/sh
+#SBATCH --time=96:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=20
+#SBATCH --account=wolf-kp
+#SBATCH --partition=wolf-kp
+#SBATCH --job-name=dedup
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=zach.gompert@usu.edu
+
+module load samtools
+##Version: 1.16 (using htslib 1.16)
+
+cd /scratch/general/nfs1/cmac
+
+perl /uufs/chpc.utah.edu/common/home/gompert-group2/data/cmac_poolseq/Scripts/RemoveDupsFork.pl realn*bam
+```
+
+Which runs:
+
+```perl
+#!/usr/bin/perl
+#
+# PCR duplicate removal with samtools
+#
+
+
+use Parallel::ForkManager;
+my $max = 20;
+my $pm = Parallel::ForkManager->new($max);
+
+FILES:
+foreach $bam (@ARGV){
+	$pm->start and next FILES; ## fork
+	$bam =~ m/^realn_([A-Z0-9]+)/ or die "failed to match $bam\n";
+	$base = $1;
+	## using default definition of dups
+	## measure positions based on template start/end (default). = -m t
+	system "samtools markdup -T /scratch/general/nfs1/dedup/ -r $bam dedup_$base.bam\n";
+	$pm->finish;
+}
+
+$pm->wait_all_children;
+```
+
