@@ -244,4 +244,77 @@ foreach $bam (@ARGV){
 
 $pm->wait_all_children;
 ```
+I am using `bcftools` (version 1.16) for variant calling. This is not aware of the pooled nature of the data, but should be fine for getting the allele depth and a set of variants. I am parallelizing the variant calling across sets of scaffolds to speed things up. Thus, I first made region list files with sets of 99 scaffolds. I then did the following for variant calling.
+
+Indexed the bam files with duplicates removed.
+
+```perl
+#!/usr/bin/perl
+#
+# index with samtools 1.16
+#
+
+
+use Parallel::ForkManager;
+my $max = 40;
+my $pm = Parallel::ForkManager->new($max);
+
+FILES:
+foreach $bam (@ARGV){
+	$pm->start and next FILES; ## fork
+	system "samtools index -b $bam\n";
+	$pm->finish;
+}
+
+$pm->wait_all_children;
+```
+Variant callin batch submission (scaf*list denote the region list files),
+
+```bash
+#!/bin/sh
+#SBATCH --time=120:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=24
+#SBATCH --account=gompert-np
+#SBATCH --partition=gompert-np
+#SBATCH --job-name=bcf_call
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-user=zach.gompert@usu.edu
+
+
+module load samtools
+## version 1.16
+module load bcftools
+## version 1.16
+
+cd /scratch/general/nfs1/cmac
+
+perl /uufs/chpc.utah.edu/common/home/gompert-group2/data/cmac_poolseq/Scripts/BcfForkLg.pl scaf*list 
+```
+which runs
+
+```perl
+#!/usr/bin/perl
+#
+# samtools/bcftools variant calling for subset of scaffolds 
+#
+
+
+use Parallel::ForkManager;
+my $max = 48;
+my $pm = Parallel::ForkManager->new($max);
+
+my $genome ="/uufs/chpc.utah.edu/common/home/gompert-group1/data/cmac_qtl_AR/goran_genome/reference/CAACVG01.fasta";
+
+foreach $chrom (@ARGV){
+	$pm->start and next; ## fork
+        $chrom =~ m/scafSet(\d+)/ or die "failed here: $chrom\n";
+	$out = "o_cmacpool_scset$1";
+	system "bcftools mpileup -b bams -d 1000 -f $genome -R $chrom -a FORMAT/DP,FORMAT/AD -q 20 -Q 30 -I -Ou | bcftools call -v -c -p 0.01 -Ov -o $out"."vcf\n";
+	$pm->finish;
+
+}
+
+$pm->wait_all_children;
+```
 
