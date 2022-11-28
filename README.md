@@ -318,3 +318,4 @@ foreach $chrom (@ARGV){
 $pm->wait_all_children;
 ```
 
+I copied the raw vcf files back to /uufs/chpc.utah.edu/common/home/gompert-group2/data/cmac_poolseq/Variants. Then, I used my own perl script [vcfFilter.pl](vcfFilter.pl) to filter the SNP sets based on coverage (500X total, or 50X for each of the 10 samples on average) and standard bias tests. I also removed multiallelic SNPs and indels. This left me with 21469120 SNPs in the file filtered_cmacPool.vcf.
