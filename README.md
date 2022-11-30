@@ -330,3 +330,22 @@ grep ^ENA filtered_cmacPool.vcf | perl -p -i -e 's/^.+AD\s+//' | perl -p -i -e '
 I moved these files to a projects directory, /uufs/chpc.utah.edu/common/home/gompert-group2/projects/cmac_popgen.
 
 # PoolSeq initial analyses
+
+Genome-wide Fst estimates for focal population/line comparisons (based on SNPs with minimum coverage of 25X in any one population).
+
+| Pop. 1 | Pop. 2 | Fst |
+|--------|--------|-----|
+|   BF1F1C | BF2F20L | 0.049| 
+|   BF1F1C | BF4F20L | 0.058| 
+|   BF1F1C | BF5F20L | 0.109| 
+|  BF2F20L | BF4F20L | 0.070| 
+|   BZ1F1C | BZ4F20L | 0.059| 
+|   BZ1F1C | BZ5F20L | 0.059| 
+|  BZ4F20L | BZ5F20L | 0.040| 
+|   CA1F1C | CA4F20L | 0.035| 
+|   CA1F1C | CA5F20L | 0.036| 
+| CA4F20L | CA5F20L | 0.028| 
+|  BF1F1C  | BZ1F1C | 0.159| 
+|  BF1F1C  | CA1F1C | 0.154| 
+|  BZ1F1C  | CA1F1C | 0.083| 
+
