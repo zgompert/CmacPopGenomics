@@ -331,6 +331,11 @@ I moved these files to a projects directory, /uufs/chpc.utah.edu/common/home/gom
 
 # PoolSeq initial analyses
 
+All analyses are in `popGen.R`. 
+
+PCA (for a random subset of 1 million SNPs). As expected, BF5F20L looks admixed. There was less change it appears in CA during adaptation than the other populations.
+
+
 Genome-wide Fst estimates for focal population/line comparisons (based on SNPs with minimum coverage of 25X in any one population).
 
 | Pop. 1 | Pop. 2 | Fst |
@@ -349,3 +354,4 @@ Genome-wide Fst estimates for focal population/line comparisons (based on SNPs w
 |  BF1F1C  | CA1F1C | 0.154| 
 |  BZ1F1C  | CA1F1C | 0.083| 
 
+Looked at correlations in change. Clear evidence of consistency in replicates and different parts of the genome being involved in lentil adaptation vs differences among populations. Need to think of a nice way to summarize this for the NSF grant.
