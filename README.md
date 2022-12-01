@@ -356,4 +356,4 @@ Genome-wide Fst estimates for focal population/line comparisons (based on SNPs w
 |  BF1F1C  | CA1F1C | 0.154| 
 |  BZ1F1C  | CA1F1C | 0.083| 
 
-Looked at correlations in change. Clear evidence of consistency in replicates and different parts of the genome being involved in lentil adaptation vs differences among populations. Need to think of a nice way to summarize this for the NSF grant.
+Looked at correlations in change. Clear evidence of consistency in replicates and different parts of the genome being involved in lentil adaptation vs differences among populations. Need to think of a nice way to summarize this for the NSF grant. One comparison to look at: cowpea vs. lentil Fst for different source populations; this gets at whether there is a consistent basis for lentil adaptation across sources. It would also be good to get some Fst estimates for cowpea vs lentil between sources (really all apirs, the speciation continuum might be a nice figure). 
