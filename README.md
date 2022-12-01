@@ -335,6 +335,8 @@ All analyses are in `popGen.R`.
 
 PCA (for a random subset of 1 million SNPs). As expected, BF5F20L looks admixed. There was less change it appears in CA during adaptation than the other populations.
 
+![cmacPCA](https://user-images.githubusercontent.com/31893662/204957277-e2e535a0-1590-42e1-a970-e93808367f7c.png)
+
 
 Genome-wide Fst estimates for focal population/line comparisons (based on SNPs with minimum coverage of 25X in any one population).
 
