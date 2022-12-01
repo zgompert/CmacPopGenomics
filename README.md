@@ -331,7 +331,7 @@ I moved these files to a projects directory, /uufs/chpc.utah.edu/common/home/gom
 
 # PoolSeq initial analyses
 
-All analyses are in `popGen.R`. 
+All analyses are in [popGen.R](popGen.R). 
 
 PCA (for a random subset of 1 million SNPs). As expected, BF5F20L looks admixed. There was less change it appears in CA during adaptation than the other populations.
 
